@@ -6,7 +6,7 @@ const NodeContainer = styled.div`
   position: absolute;
   left: ${(props) => props.x}px;
   top: ${(props) => props.y}px;
-  transition: left 0.2s ease, top 0.2s ease; /* Added transition for smooth movement */
+  transition: left 0.2s ease, top 0.2s ease;
 `;
 
 const NodeDiv = styled.div`
@@ -32,19 +32,25 @@ const NodeDiv = styled.div`
   }
 `;
 
-const EditableDiv = styled(NodeDiv)`
+const EditableDiv = styled.div`
+  box-sizing: border-box;
   cursor: text;
-
-  &:active {
-    transform: none;
-  }
+  padding: 10px 15px;
+  background-color: #ffffff;
+  border: 2px solid #007BFF;
+  border-radius: 5px;
+  user-select: none;
+  min-width: 50px;
+  outline: none;
+  white-space: pre-wrap; // Preserve whitespace and newlines
 `;
 
 function DraggableNode({ node }) {
-  const ref = useRef(null);
+  const dragRef = useRef(null);
+  const editRef = useRef(null);
   const previewRef = useRef(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [nodeText, setNodeText] = useState(node.text);
+  const [nodeContent, setNodeContent] = useState(node.text);
 
   const [, drag, preview] = useDrag({
     type: 'NODE',
@@ -52,27 +58,36 @@ function DraggableNode({ node }) {
     collect: (monitor) => ({ isDragging: monitor.isDragging() }),
   });
 
-  drag(ref);
+  drag(dragRef);
+
   useEffect(() => {
     preview(previewRef.current);
   }, [preview]);
 
+  const handleDoubleClick = () => {
+    setIsEditing(true);
+    setTimeout(() => {
+      if (editRef.current) {
+        window.getSelection().selectAllChildren(editRef.current);
+      }
+    }, 0);
+  };
+
   return (
-    <NodeContainer ref={ref} x={node.x} y={node.y}>
+    <NodeContainer ref={dragRef} x={node.x} y={node.y}>
       {isEditing ? (
         <EditableDiv
           contentEditable
           suppressContentEditableWarning={true}
           onBlur={() => {
             setIsEditing(false);
-            setNodeText(ref.current.textContent);
+            setNodeContent(editRef.current.innerHTML); // Save content as HTML
           }}
-          ref={ref}
-        >
-          {nodeText}
-        </EditableDiv>
+          ref={editRef}
+          dangerouslySetInnerHTML={{ __html: nodeContent }} // Render content as HTML
+        />
       ) : (
-        <NodeDiv onDoubleClick={() => setIsEditing(true)}>{nodeText}</NodeDiv>
+        <NodeDiv onDoubleClick={handleDoubleClick} dangerouslySetInnerHTML={{ __html: nodeContent }} />
       )}
       <div ref={previewRef} style={{ display: 'none' }} />
     </NodeContainer>
