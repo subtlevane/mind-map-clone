@@ -7,15 +7,27 @@ export default function ConnectionLine({ from, to }) {
   const endX = to.x;
   const endY = to.y + nodeHeight / 2;
 
-  // Adjust control point based on relative positions of nodes
-  const controlPointX = (startX + endX) / 2;
-  const deltaY = endY - startY;
-  const controlPointY = startY + deltaY / 3;  // Adjust this value to change the curve's height
+  let pathData;
 
-  const pathData = `
-    M ${startX} ${startY}
-    Q ${controlPointX} ${controlPointY}, ${endX} ${endY}
-  `;
+  if (Math.abs(endY - startY) < nodeHeight) {
+    // Nodes are close vertically
+    const midX = (startX + endX) / 2;
+    const curveDist = nodeHeight + 20;  // 20px buffer for aesthetics
+    const controlPointY1 = (endY > startY) ? startY - curveDist : startY + curveDist;
+    const controlPointY2 = (endY > startY) ? endY + curveDist : endY - curveDist;
+
+    pathData = `
+      M ${startX} ${startY}
+      C ${midX} ${controlPointY1}, ${midX} ${controlPointY2}, ${endX} ${endY}
+    `;
+  } else {
+    // Nodes are not close vertically
+    const controlPointX = (endX > startX) ? startX + (endX - startX) / 4 : startX - (startX - endX) / 4;
+    pathData = `
+      M ${startX} ${startY}
+      Q ${controlPointX} ${startY}, ${endX} ${endY}
+    `;
+  }
 
   return (
     <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
