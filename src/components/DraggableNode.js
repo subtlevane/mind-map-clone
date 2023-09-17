@@ -54,7 +54,6 @@ function DraggableNode({ node, onClick }) {
   const [, drag] = useDrag({
     type: 'NODE',
     item: { id: node.id, initialX: node.x, initialY: node.y },
-    collect: (monitor) => ({ isDragging: monitor.isDragging() }),
   });
 
   drag(dragRef);
