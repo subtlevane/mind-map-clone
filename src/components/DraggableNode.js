@@ -51,13 +51,14 @@ function DraggableNode({ node, onClick }) {
   const [isEditing, setIsEditing] = useState(false);
   const [nodeContent, setNodeContent] = useState(node.text);
 
-  const [, drag] = useDrag({
+  const [, drag, preview] = useDrag({
     type: 'NODE',
     item: { id: node.id, initialX: node.x, initialY: node.y },
   });
 
   drag(dragRef);
-
+  preview(null);  // This line removes the drag preview
+  
   const handleDoubleClick = () => {
     setIsEditing(true);
     setTimeout(() => {
