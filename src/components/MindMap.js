@@ -29,10 +29,16 @@ function MindMap() {
       id: uuidv4(),
       text: `Node ${nodes.length + 1}`,
       x: window.innerWidth / 2,
-      y: window.innerHeight / 2,
+      y: window.innerHeight / 2 + nodes.length * 100, // Adjusted positioning
     };
+    const recommendationNodes = Array(3).fill().map((_, index) => ({
+      id: uuidv4(),
+      text: 'Recommendation Node',
+      x: newNode.x + 200,
+      y: newNode.y + index * 100,
+    }));
     setHistory((prevHistory) => [...prevHistory, nodes]);
-    setNodes((prevNodes) => [...prevNodes, newNode]);
+    setNodes((prevNodes) => [...prevNodes, newNode, ...recommendationNodes]);
   };
 
   const undo = () => {
