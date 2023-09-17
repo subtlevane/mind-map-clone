@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useDrag } from 'react-dnd';
 import styled from 'styled-components';
 
@@ -45,24 +45,19 @@ const EditableDiv = styled.div`
   white-space: pre-wrap; // Preserve whitespace and newlines
 `;
 
-function DraggableNode({ node }) {
+function DraggableNode({ node, onClick }) {
   const dragRef = useRef(null);
   const editRef = useRef(null);
-  const previewRef = useRef(null);
   const [isEditing, setIsEditing] = useState(false);
   const [nodeContent, setNodeContent] = useState(node.text);
 
-  const [, drag, preview] = useDrag({
+  const [, drag] = useDrag({
     type: 'NODE',
     item: { id: node.id, initialX: node.x, initialY: node.y },
     collect: (monitor) => ({ isDragging: monitor.isDragging() }),
   });
 
   drag(dragRef);
-
-  useEffect(() => {
-    preview(previewRef.current);
-  }, [preview]);
 
   const handleDoubleClick = () => {
     setIsEditing(true);
@@ -74,7 +69,7 @@ function DraggableNode({ node }) {
   };
 
   return (
-    <NodeContainer ref={dragRef} x={node.x} y={node.y}>
+    <NodeContainer ref={dragRef} x={node.x} y={node.y} onClick={() => onClick(node)}>
       {isEditing ? (
         <EditableDiv
           contentEditable
@@ -89,7 +84,6 @@ function DraggableNode({ node }) {
       ) : (
         <NodeDiv onDoubleClick={handleDoubleClick} dangerouslySetInnerHTML={{ __html: nodeContent }} />
       )}
-      <div ref={previewRef} style={{ display: 'none' }} />
     </NodeContainer>
   );
 }
