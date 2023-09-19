@@ -1,33 +1,64 @@
+import React from 'react';
+import { useNodes } from './NodeContext'; // Adjust the path based on your project structure
+
+function checkForObstaclesBetween(from, to, nodes) {
+  // Define a threshold to determine if a node is considered an "obstacle".
+  const threshold = 20;
+
+  for (let node of nodes) {
+    if (node === from || node === to) continue;
+    if (node.x > Math.min(from.x, to.x) + threshold && node.x < Math.max(from.x, to.x) - threshold) {
+      if (node.y > Math.min(from.y, to.y) + threshold && node.y < Math.max(from.y, to.y) - threshold) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 export default function ConnectionLine({ from, to }) {
+  const { nodes } = useNodes(); // Access the current node positions using the useNodes hook
   const nodeWidth = 100;
   const nodeHeight = 50;
 
-  const startX = from.x + nodeWidth;
-  const startY = from.y + nodeHeight / 2;
-  const endX = to.x;
-  const endY = to.y + nodeHeight / 2;
+  function refineControlPoints(from, to, obstacle) {
+    const midpoint = {
+      x: (from.x + to.x) / 2,
+      y: (from.y + to.y) / 2,
+    };
 
-  let pathData;
+    let controlPoint1, controlPoint2;
 
-  if (Math.abs(endY - startY) < nodeHeight) {
-    // Nodes are close vertically
-    const midX = (startX + endX) / 2;
-    const curveDist = nodeHeight + 20;  // 20px buffer for aesthetics
-    const controlPointY1 = (endY > startY) ? startY - curveDist : startY + curveDist;
-    const controlPointY2 = (endY > startY) ? endY + curveDist : endY - curveDist;
+    if (obstacle) {
+      controlPoint1 = {
+        x: from.x + nodeWidth,
+        y: midpoint.y,
+      };
+      controlPoint2 = {
+        x: to.x,
+        y: midpoint.y,
+      };
+    } else {
+      controlPoint1 = {
+        x: from.x + nodeWidth + (to.x - from.x) / 3,
+        y: from.y + nodeHeight / 2,
+      };
+      controlPoint2 = {
+        x: to.x - (to.x - from.x) / 3,
+        y: to.y + nodeHeight / 2,
+      };
+    }
 
-    pathData = `
-      M ${startX} ${startY}
-      C ${midX} ${controlPointY1}, ${midX} ${controlPointY2}, ${endX} ${endY}
-    `;
-  } else {
-    // Nodes are not close vertically
-    const controlPointX = (endX > startX) ? startX + (endX - startX) / 4 : startX - (startX - endX) / 4;
-    pathData = `
-      M ${startX} ${startY}
-      Q ${controlPointX} ${startY}, ${endX} ${endY}
-    `;
+    return [controlPoint1, controlPoint2];
   }
+
+  function calculateBezier(from, to, obstacle) {
+    const [controlPoint1, controlPoint2] = refineControlPoints(from, to, obstacle);
+    return `M ${from.x + nodeWidth} ${from.y + nodeHeight / 2} C ${controlPoint1.x} ${controlPoint1.y}, ${controlPoint2.x} ${controlPoint2.y}, ${to.x} ${to.y + nodeHeight / 2}`;
+  }
+
+  const obstacle = checkForObstaclesBetween(from, to, nodes);
+  const pathData = calculateBezier(from, to, obstacle);
 
   return (
     <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
