@@ -25,17 +25,20 @@ class PriorityQueue {
     const neighbors = [];
     const { x, y } = point;
   
+    if (grid[x]) {
+      if (grid[x][y - 1] === 'open') {
+        neighbors.push({ x, y: y - 1 });
+      }
+      if (grid[x][y + 1] === 'open') {
+        neighbors.push({ x, y: y + 1 });
+      }
+    }
+  
     if (grid[x - 1] && grid[x - 1][y] === 'open') {
       neighbors.push({ x: x - 1, y });
     }
     if (grid[x + 1] && grid[x + 1][y] === 'open') {
       neighbors.push({ x: x + 1, y });
-    }
-    if (grid[x][y - 1] === 'open') {
-      neighbors.push({ x, y: y - 1 });
-    }
-    if (grid[x][y + 1] === 'open') {
-      neighbors.push({ x, y: y + 1 });
     }
   
     return neighbors;
@@ -77,3 +80,4 @@ class PriorityQueue {
   
     return []; // Return an empty array if no path is found
   }
+  

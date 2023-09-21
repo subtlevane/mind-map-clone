@@ -38,3 +38,8 @@ export const ActionButton = styled.button`
     transform: scale(0.98); // Subtle press effect.
   }
 `;
+
+export const Node = styled.div`
+  // ... existing styles
+  transition: transform 0.3s ease-out;
+`;
