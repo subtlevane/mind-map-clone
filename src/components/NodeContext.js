@@ -1,15 +1,10 @@
 import React, { createContext, useState, useContext, useCallback } from 'react';
 
-// Create a context for node data
 const NodeContext = createContext();
 
-/**
- * Provider component to manage and provide node data to child components.
- */
 export const NodeProvider = ({ children }) => {
   const [nodes, setNodes] = useState([]);
 
-  // Update the position of a specific node based on its ID
   const updateNodePosition = useCallback((id, position) => {
     setNodes(prevNodes => {
       const updatedNodes = prevNodes.map(node => 
@@ -17,6 +12,8 @@ export const NodeProvider = ({ children }) => {
       );
       return updatedNodes;
     });
+    // Add code here to update grid
+    // Example: grid[position.x][position.y] = 'blocked';
   }, []);
 
   return (
@@ -26,9 +23,6 @@ export const NodeProvider = ({ children }) => {
   );
 };
 
-/**
- * Custom hook to access node data and updater function.
- */
 export const useNodes = () => {
   const context = useContext(NodeContext);
   if (!context) {

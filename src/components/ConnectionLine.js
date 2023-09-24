@@ -9,6 +9,8 @@ function generateControlPoints(path) {
   const startPoint = path[0];
   const endPoint = path[path.length - 1];
 
+  // Calculate control points based on the start and end points.
+  // This is a simplified example; you may need more complex logic.
   const controlPoint1 = {
     x: startPoint.x + (endPoint.x - startPoint.x) / 3,
     y: startPoint.y + (endPoint.y - startPoint.y) / 3
@@ -31,7 +33,6 @@ function calculateBezier(from, to, grid) {
 
 export default function ConnectionLine({ from, to, grid }) {
   const pathData = calculateBezier(from, to, grid);
-
   return (
     <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
       <path 

@@ -9,6 +9,7 @@ function MindMap() {
   const [nodes, setNodes] = useState([]);
   const [nodeHistory, setNodeHistory] = useState([]);
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
+  const [grid, setGrid] = useState(Array(1000).fill(null).map(() => Array(1000).fill('open'))); // Initialize grid
 
   const [, drop] = useDrop({
     accept: 'NODE',
@@ -48,11 +49,31 @@ function MindMap() {
     const newNode = createMainNode();
     const recommendationNodes = createRecommendationNodes(newNode);
     setNodes(prevNodes => [...prevNodes, newNode, ...recommendationNodes]);
+    
+    // Update grid using setGrid
+    setGrid(prevGrid => {
+      const newGrid = [...prevGrid];
+      newGrid[newNode.x][newNode.y] = 'blocked';
+      return newGrid;
+    });
   };
-
+  
   const deleteNode = (nodeId) => {
+    const deletedNode = nodes.find(node => node.id === nodeId);
+    
+    // Update grid using setGrid
+    if (deletedNode) {
+      setGrid(prevGrid => {
+        const newGrid = [...prevGrid];
+        newGrid[deletedNode.x][deletedNode.y] = 'open';
+        return newGrid;
+      });
+    }
+    
     setNodes(prevNodes => prevNodes.filter(node => node.id !== nodeId));
   };
+  
+  
 
   const handleNodeClick = (node) => {
     if (node.type === 'recommendation') {
@@ -63,7 +84,7 @@ function MindMap() {
 
   const renderConnections = () => {
     return nodes.filter(node => node.parent).map(node => (
-      <ConnectionLine key={`connection-${node.id}`} from={nodes.find(n => n.id === node.parent)} to={node} />
+      <ConnectionLine key={`connection-${node.id}`} from={nodes.find(n => n.id === node.parent)} to={node} grid={grid} />
     ));
   };
 
