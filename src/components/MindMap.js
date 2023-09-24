@@ -45,34 +45,34 @@ function MindMap() {
     }));
   };
 
-  const addNewNode = () => {
-    const newNode = createMainNode();
-    const recommendationNodes = createRecommendationNodes(newNode);
-    setNodes(prevNodes => [...prevNodes, newNode, ...recommendationNodes]);
-    
-    // Update grid using setGrid
+const addNewNode = () => {
+  const newNode = createMainNode();
+  const recommendationNodes = createRecommendationNodes(newNode);
+  setNodes(prevNodes => [...prevNodes, newNode, ...recommendationNodes]);
+  
+  // Update grid using setGrid
+  setGrid(prevGrid => {
+    const newGrid = [...prevGrid];
+    newGrid[newNode.x][newNode.y] = 'blocked';
+    return newGrid;
+  });
+};
+
+const deleteNode = (nodeId) => {
+  const deletedNode = nodes.find(node => node.id === nodeId);
+  
+  // Update grid using setGrid
+  if (deletedNode) {
     setGrid(prevGrid => {
       const newGrid = [...prevGrid];
-      newGrid[newNode.x][newNode.y] = 'blocked';
+      newGrid[deletedNode.x][deletedNode.y] = 'open';
       return newGrid;
     });
-  };
+  }
   
-  const deleteNode = (nodeId) => {
-    const deletedNode = nodes.find(node => node.id === nodeId);
-    
-    // Update grid using setGrid
-    if (deletedNode) {
-      setGrid(prevGrid => {
-        const newGrid = [...prevGrid];
-        newGrid[deletedNode.x][deletedNode.y] = 'open';
-        return newGrid;
-      });
-    }
-    
-    setNodes(prevNodes => prevNodes.filter(node => node.id !== nodeId));
-  };
-  
+  setNodes(prevNodes => prevNodes.filter(node => node.id !== nodeId));
+};
+
   
 
   const handleNodeClick = (node) => {
