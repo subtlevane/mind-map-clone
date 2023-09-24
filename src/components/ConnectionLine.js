@@ -9,8 +9,6 @@ function generateControlPoints(path) {
   const startPoint = path[0];
   const endPoint = path[path.length - 1];
 
-  // Calculate control points based on the start and end points.
-  // This is a simplified example; you may need more complex logic.
   const controlPoint1 = {
     x: startPoint.x + (endPoint.x - startPoint.x) / 3,
     y: startPoint.y + (endPoint.y - startPoint.y) / 3
@@ -25,6 +23,10 @@ function generateControlPoints(path) {
 }
 
 function calculateBezier(from, to, grid) {
+  if (!from || !to) {
+    console.error("Invalid 'from' or 'to' points");
+    return;
+  }
   const path = aStar(grid, from, to);
   const [controlPoint1, controlPoint2] = generateControlPoints(path);
 
